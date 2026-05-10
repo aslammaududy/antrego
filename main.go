@@ -3,6 +3,7 @@ package main
 import (
 	"antrego/config"
 	"antrego/handlers"
+	"antrego/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,6 +11,7 @@ import (
 func main() {
 	// Create a Gin router with default middleware (logger and recovery)
 	r := gin.Default()
+	r.Use(middleware.ErrorHandler())
 	config.Connect()
 
 	r.GET("/queues", handlers.GetAllQueue)

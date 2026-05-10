@@ -9,10 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func GenerateQueue(clinicCode string) {
+func GenerateQueue(clinicCode string) error {
 	queues, err := gorm.G[models.Queue](config.DB).Where("clinic_code = ?", clinicCode).Find(config.Ctx)
 	if err != nil {
-		return
+		return err
 	}
 
 	queue := models.Queue{
@@ -24,8 +24,9 @@ func GenerateQueue(clinicCode string) {
 
 	err = gorm.G[models.Queue](config.DB).Create(config.Ctx, &queue)
 	if err != nil {
-		return
+		return err
 	}
+	return nil
 }
 
 func generateBookingCode(sequence int) string {
