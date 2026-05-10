@@ -1,9 +1,27 @@
 package middleware
 
 import (
+	"antrego/dto"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+)
+
+type AppError struct {
+	Status  int    `json:"-"`
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+func (e *AppError) Error() string {
+	return e.Message
+}
+
+var (
+	ErrNotFound     = &AppError{Status: 404, Code: "NOT_FOUND", Message: "resource not found"}
+	ErrUnauthorized = &AppError{Status: 401, Code: "UNAUTHORIZED", Message: "authentication required"}
+	ErrBadRequest   = &AppError{Status: 400, Code: "BAD_REQUEST", Message: "invalid request"}
 )
 
 func ErrorHandler() gin.HandlerFunc {
@@ -14,10 +32,12 @@ func ErrorHandler() gin.HandlerFunc {
 		if len(c.Errors) > 0 {
 			err := c.Errors.Last().Err
 
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"message": err.Error(),
-			})
+			if appErr, ok := errors.AsType[*AppError](err); ok {
+				dto.Fail(c, appErr.Status, appErr.Code, appErr.Message)
+
+			} else {
+				dto.Fail(c, http.StatusInternalServerError, "INTERNAL", err.Error())
+			}
 		}
 	}
 }

@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"antrego/config"
+	"antrego/dto"
 	"antrego/dto/queue"
+	"antrego/middleware"
 	"antrego/models"
 	"antrego/services"
 	"errors"
@@ -16,13 +18,14 @@ func GetAllQueue(c *gin.Context) {
 	if err != nil {
 		c.Error(errors.New(err.Error()))
 	}
-	c.JSON(200, queue.NewListResponse(queues))
+
+	dto.OK(c, queue.NewListResponse(queues))
 }
 
 func BookTheQueue(c *gin.Context) {
 	var request queue.BookRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.Error(errors.New(err.Error()))
+		c.Error(middleware.ErrBadRequest)
 		return
 	}
 
@@ -31,7 +34,8 @@ func BookTheQueue(c *gin.Context) {
 		c.Error(errors.New(err.Error()))
 		return
 	}
-	c.JSON(201, gin.H{"success": true})
+
+	dto.Created(c)
 }
 
 func MyQueue(c *gin.Context) {
@@ -39,8 +43,14 @@ func MyQueue(c *gin.Context) {
 
 	myQueue, err := gorm.G[models.Queue](config.DB).Where("booking_code = ?", bookingCode).First(c.Request.Context())
 	if err != nil {
-		c.Error(errors.New(err.Error()))
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.Error(middleware.ErrNotFound)
+			return
+		} else {
+			c.Error(errors.New(err.Error()))
+			return
+		}
 	}
 
-	c.JSON(200, queue.NewResponse(myQueue))
+	dto.OK(c, queue.NewResponse(myQueue))
 }
