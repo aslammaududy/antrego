@@ -1,7 +1,6 @@
 package config
 
 import (
-	"context"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -10,7 +9,6 @@ import (
 )
 
 var DB *gorm.DB
-var Ctx context.Context
 
 func Connect() {
 	err := godotenv.Load()
@@ -23,6 +21,4 @@ func Connect() {
 	}
 
 	DB = db
-	ctx := context.Background()
-	Ctx = ctx
 }

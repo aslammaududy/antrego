@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func GenerateQueue(clinicCode string) error {
-	queues, err := gorm.G[models.Queue](config.DB).Where("clinic_code = ?", clinicCode).Find(config.Ctx)
+func GenerateQueue(c *gin.Context, clinicCode string) error {
+	queues, err := gorm.G[models.Queue](config.DB).Where("clinic_code = ?", clinicCode).Find(c.Request.Context())
 	if err != nil {
 		return err
 	}
@@ -22,7 +23,7 @@ func GenerateQueue(clinicCode string) error {
 		EstimatedTime: estimate(len(queues)),
 	}
 
-	err = gorm.G[models.Queue](config.DB).Create(config.Ctx, &queue)
+	err = gorm.G[models.Queue](config.DB).Create(c.Request.Context(), &queue)
 	if err != nil {
 		return err
 	}
