@@ -12,4 +12,5 @@ type Queue struct {
 	ClinicCode    string `gorm:"unique"`
 	Number        int
 	EstimatedTime time.Time
+	Status        string
 }

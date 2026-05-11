@@ -10,10 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func GenerateQueue(c *gin.Context, clinicCode string) error {
+func GenerateQueue(c *gin.Context, clinicCode string) (models.Queue, error) {
 	queues, err := gorm.G[models.Queue](config.DB).Where("clinic_code = ?", clinicCode).Find(c.Request.Context())
 	if err != nil {
-		return err
+		return models.Queue{}, err
 	}
 
 	queue := models.Queue{
@@ -21,13 +21,14 @@ func GenerateQueue(c *gin.Context, clinicCode string) error {
 		ClinicCode:    clinicCode,
 		Number:        len(queues) + 1,
 		EstimatedTime: estimate(len(queues)),
+		Status:        "booked",
 	}
-
-	err = gorm.G[models.Queue](config.DB).Create(c.Request.Context(), &queue)
+	result := gorm.WithResult()
+	err = gorm.G[models.Queue](config.DB, result).Create(c.Request.Context(), &queue)
 	if err != nil {
-		return err
+		return models.Queue{}, err
 	}
-	return nil
+	return queue, nil
 }
 
 func generateBookingCode(sequence int) string {
@@ -41,4 +42,18 @@ func estimate(totalQueue int) time.Time {
 	waitingTime := totalQueue * waitingTimePerPatient
 
 	return startTime.Add(time.Duration(waitingTime))
+}
+
+func UpdateQueueStatus(c *gin.Context, bookingCode, status string) (models.Queue, error) {
+	_, err := gorm.G[models.Queue](config.DB).Where("booking_code = ?", bookingCode).Update(c.Request.Context(), "status", status)
+	if err != nil {
+		return models.Queue{}, err
+	}
+
+	myQueue, err := gorm.G[models.Queue](config.DB).Where("booking_code = ?", bookingCode).First(c.Request.Context())
+	if err != nil {
+		return models.Queue{}, err
+	}
+
+	return myQueue, nil
 }

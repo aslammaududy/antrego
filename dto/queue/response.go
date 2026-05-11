@@ -7,6 +7,7 @@ type Response struct {
 	BookingCode string `json:"booking_code"`
 	ClinicCode  string `json:"clinic_code"`
 	Number      int    `json:"number"`
+	Status      string `json:"status"`
 }
 
 func NewResponse(queue models.Queue) Response {
@@ -15,6 +16,7 @@ func NewResponse(queue models.Queue) Response {
 		BookingCode: queue.BookingCode,
 		ClinicCode:  queue.ClinicCode,
 		Number:      queue.Number,
+		Status:      queue.Status,
 	}
 }
 

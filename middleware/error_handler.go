@@ -19,9 +19,10 @@ func (e *AppError) Error() string {
 }
 
 var (
-	ErrNotFound     = &AppError{Status: 404, Code: "NOT_FOUND", Message: "resource not found"}
-	ErrUnauthorized = &AppError{Status: 401, Code: "UNAUTHORIZED", Message: "authentication required"}
-	ErrBadRequest   = &AppError{Status: 400, Code: "BAD_REQUEST", Message: "invalid request"}
+	ErrNotFound      = &AppError{Status: 404, Code: "NOT_FOUND", Message: "resource not found"}
+	ErrUnauthorized  = &AppError{Status: 401, Code: "UNAUTHORIZED", Message: "authentication required"}
+	ErrBadRequest    = &AppError{Status: 400, Code: "BAD_REQUEST", Message: "invalid request"}
+	ErrInvalidStatus = &AppError{Status: 422, Code: "INVALID_STATUS", Message: "can't cancel the queue. Queue status is done"}
 )
 
 func ErrorHandler() gin.HandlerFunc {
