@@ -19,7 +19,7 @@ func GenerateQueue(c *gin.Context, clinicCode string) (models.Queue, error) {
 	queue := models.Queue{
 		BookingCode:   generateBookingCode(len(queues) + 1),
 		ClinicCode:    clinicCode,
-		Number:        len(queues) + 1,
+		Number:        fmt.Sprintf("%s-%d", clinicCode, len(queues)+1),
 		EstimatedTime: estimate(len(queues)),
 		Status:        "booked",
 	}

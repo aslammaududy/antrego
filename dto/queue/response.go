@@ -6,7 +6,7 @@ type Response struct {
 	ID          uint   `json:"id"`
 	BookingCode string `json:"booking_code"`
 	ClinicCode  string `json:"clinic_code"`
-	Number      int    `json:"number"`
+	Number      string `json:"number"`
 	Status      string `json:"status"`
 }
 

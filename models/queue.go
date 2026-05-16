@@ -10,7 +10,7 @@ type Queue struct {
 	gorm.Model
 	BookingCode   string `gorm:"unique"`
 	ClinicCode    string `gorm:"unique"`
-	Number        int
+	Number        string
 	EstimatedTime time.Time
 	Status        string
 }
